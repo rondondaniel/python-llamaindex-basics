@@ -40,7 +40,7 @@ class TheWorkflow(Workflow):
     @step
     async def step_two(self, ctx: Context, event: FirstEvent) -> SecondEvent:
         llm = OpenAI(model="gpt-4o-mini", api_key=API_KEY)
-        generator = await llm.astream_complete("What is the capital of France?")
+        generator = await llm.astream_complete("write a short novel about the capital of France?")
         async for response in generator:
             ctx.write_event_to_stream(ProcessEvent(msg=response.delta))
 
@@ -57,7 +57,7 @@ class TheWorkflow(Workflow):
 
 async def main():
     w = TheWorkflow(timeout=30, verbose=True)
-    handlre = await w.run(first_input="Start the workflow.")
+    handlre = w.run(first_input="Start the workflow.")
 
     async for event in handlre.stream_events():
         if isinstance(event, ProcessEvent):
@@ -66,7 +66,7 @@ async def main():
     final_result = await handlre
     print(final_result)
 
-    draw_all_possible_flows(TheWorkflow, filename="basic_workflow.html")
+    draw_all_possible_flows(TheWorkflow, filename="Streaming_workflow.html")
 
 if __name__ == "__main__":
     asyncio.run(main())
